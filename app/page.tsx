@@ -372,7 +372,7 @@ export default function Home() {
       </div>
 
       {/* Navbar Bottom */}
-      <div className="fixed flex justify-center items-center w-full h-20 max-w-[400px] mx-auto z-20 bottom-0 rounded-t-2xl bg-[#17101f]">
+      <div className="fixed flex justify-center items-center w-full h-20 mx-auto z-20 bottom-0 rounded-t-2xl bg-[#17101f]">
         <div className="absolute flex justify-center items-center p-4 bottom-0 max-w-52 h-28 mx-auto rounded-t-full bg-[#17101f]">
           {isConnected && chainId === base.id ? (
             <Button
