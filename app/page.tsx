@@ -15,7 +15,7 @@ import {
 } from "wagmi";
 import { base } from "viem/chains";
 import sdk from "@farcaster/frame-sdk";
-import { ExternalLink, Leaf, LockKeyhole, Rocket } from "lucide-react";
+import { ExternalLink, Leaf, LockKeyhole } from "lucide-react";
 import { config } from "@/lib/config";
 import Loading from "./components/svg/Loading";
 import { clankFacesAbi, clankFacesAddress } from "@/lib/clankfaces";
@@ -34,7 +34,6 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
   const [clankFacesImageUri, setClankFacesImageUri] = useState<string>(""); // Fixed typo: clankFacesImageUris -> clankFacesImageUri
   const [showTermOfMint, setShowTermOfMint] = useState(false);
-  const [showLoadingAnimation, setShowLoadingAnimation] = useState(false);
 
   // Generate Clank Faces
   const [generatedValues, setGeneratedValues] = useState<ClankFacesProps>({
@@ -138,7 +137,6 @@ export default function Home() {
   useEffect(() => {
     if (isConfirmed) {
       setShowMintSuccess(true);
-      setShowLoadingAnimation(false);
     }
   }, [isConfirmed]);
 
@@ -153,14 +151,6 @@ export default function Home() {
       setShowTermOfMint(true);
     }
   }, [clankFacesBalance]);
-
-  useEffect(() => {
-    if (isUploading || isClankFacesPending || isConfirming) {
-      setShowLoadingAnimation(true);
-    } else {
-      setShowLoadingAnimation(false);
-    }
-  }, [isConfirming, isClankFacesPending, isUploading]);
 
   // Fetch Clank Faces blob
   const getClankFacesBlob = async (values: ClankFacesProps): Promise<Blob | undefined> => {
@@ -297,9 +287,9 @@ export default function Home() {
             <div className="w-full pt-4 justify-between items-center flex flex-row space-x-4">
               <button
                 className="w-full p-3 rounded-xl bg-gradient-to-r from-[#201029] to-[#290f37] disabled:cursor-not-allowed"
-                onClick={() => linkToBaseScan(clankFacesHash)}
+                onClick={() => linkToShare(Number(tokenId) + 1)}
               >
-                Proof
+                Share
               </button>
               <button
                 className="w-full p-3 rounded-xl bg-gradient-to-r from-[#290f37] to-[#201029] disabled:cursor-not-allowed"
@@ -309,7 +299,7 @@ export default function Home() {
               </button>
               <button
                 className="w-16 p-3 rounded-xl bg-gradient-to-r from-[#290f37] to-[#201029] disabled:cursor-not-allowed"
-                onClick={() => linkToShare(Number(tokenId) + 1)}
+                onClick={() => linkToBaseScan(clankFacesHash)}
               >
                 <ExternalLink className="w-6 h-6" />
               </button>
@@ -346,15 +336,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Loading State */}
-      {showLoadingAnimation && (
-        <div className="absolute bottom-16 w-full flex items-center justify-center z-10">
-          <div className="relative">
-            <Loading className="w-40 h-40" />
-          </div>
-        </div>
-      )}
-
       {/* Navbar Top */}
       <div className="fixed flex justify-center items-center w-full h-28 max-w-[400px] mx-auto z-20 top-0">
 
@@ -373,7 +354,7 @@ export default function Home() {
 
       {/* Navbar Bottom */}
       <div className="fixed flex justify-center items-center w-full h-20 mx-auto z-20 bottom-0 rounded-t-2xl bg-[#17101f]">
-        <div className="absolute flex justify-center items-center p-4 bottom-0 max-w-52 h-28 mx-auto rounded-t-full bg-[#17101f]">
+        <div className="absolute flex justify-center items-center p-4 bottom-0 w-[100px] h-28 mx-auto rounded-t-full bg-[#17101f]">
           {isConnected && chainId === base.id ? (
             <Button
               onClick={handleMint}
@@ -390,9 +371,12 @@ export default function Home() {
               className="w-full p-4"
             >
               {isUploading || isClankFacesPending || isConfirming ? (
-                <Rocket className="w-8 h-8 animate-bounce" />
+                <div className="absolute z-0 inset-0 flex max-w-[300px] mx-auto justify-center items-center text-gray-500 text-center">
+                  <div className="absolute animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-purple-500"></div>
+                  <Loading className="w-16 h-16" />
+                </div>
               ) : (
-                <Leaf className="w-14 h-14" />
+                <Leaf className="w-16 h-16" />
               )}
             </Button>
           ) : (
@@ -400,7 +384,7 @@ export default function Home() {
               className="w-full p-4"
               onClick={() => connect({ connector: config.connectors[0] })}
             >
-              <LockKeyhole className="w-14 h-14" />
+              <LockKeyhole className="w-16 h-16" />
             </Button>
           )}
         </div>
